@@ -12,16 +12,16 @@ A 2D top-down, grid-based arcade game built with Python and Pygame. Navigate thr
 
 ## Gameplay
 
-![Gameplay Demo](https://i.imgur.com/gkyq7BS.gif)
+![Gameplay Demo](docs/gameplay.gif)
 
 ### Unique Character Skills
 | Burger Boy | Breadwinner |
 | ---------- | ----------- |
-| ![Burgerboy Projectile](https://i.imgur.com/7kSj5nR.gif) | ![Breadwinner Invincibility](https://i.imgur.com/ueY19jR.gif) |
+| ![Burgerboy Projectile](docs/burger.gif) | ![Breadwinner Invincibility](docs/bread.gif) |
 | **Projectile Attack**: Spends score points to shoot a projectile that destroys enemies on contact. | **Invincibility**: Spends score points to become temporarily invincible, destroying enemies on collision for bonus points. |
 
 ### Dynamic Enemy AI & Power-ups
-![Enemy Freeze Powerup](https://i.imgur.com/lBiDdPi.gif)  
+![Enemy Freeze Powerup](docs/freeze.gif)  
 Enemies actively hunt the player using two distinct graph traversal algorithms:
 
 * **Enemy 1:** Utilizes **Dijkstra's Algorithm** (Priority Queue/Min-Heap).
@@ -77,5 +77,5 @@ Ensure you have Python 3.x installed on your system.
 
 ## Game Over
 
-![Game Over](https://i.imgur.com/6dRQmnK.gif)
+![Game Over](docs/gameover.gif)
 
