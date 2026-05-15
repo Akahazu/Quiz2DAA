@@ -50,9 +50,15 @@ class Enemies(pygame.sprite.Sprite):
         self.respawn_timer = 0
         self.respawn_delay = respawn_delay
 
-    def die(self):
-        # TODO 15: Implement logic when enemy dies (set state, move rect off-screen, start respawn timer)
-        pass
+    def die(self):  # called whenever the enemy died by player's skill
+        if not self.is_dead:
+            self.is_dead = True
+            self.image.fill((0, 0, 0)) 
+            self.rect.x = -1000 
+            self.pos_x = float(self.rect.x)
+            self.respawn_timer = self.respawn_delay
+            self.target_tile = None
+            self.path = []
 
     def respawn(self):
         # TODO 16: Reset enemy attributes to spawn point state
