@@ -7,17 +7,18 @@ GRID_W = GRID_WIDTH
 GRID_H = GRID_HEIGHT
 
 # Helpers
-# TODO 3: Implement is_valid, is_unblocked, and is_destination helpers
 def is_valid(x, y):
-    pass
+    return 0 <= x < GRID_W and 0 <= y < GRID_H
+
 
 def is_unblocked(grid, x, y):
-    pass
+    return not grid.is_wall(x, y)
+
 
 def is_destination(x, y, dest):
-    pass
+    return x == dest[0] and y == dest[1]
 
-# BFS Algorithm
+# ---------- BFS ----------
 def bfs_search(grid, src, dest):
     sx, sy = src
     dx, dy = dest
