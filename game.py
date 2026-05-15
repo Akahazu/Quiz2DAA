@@ -88,9 +88,93 @@ def draw_score(surface, score, font, color, x, y, outline_color=(0, 0, 0), outli
     score_text = f"SCORE: {score}"
     draw_text(surface, score_text, font, color, x, y, outline_color, outline_size)
 
-# TODO 20: Implement state-specific draw functions (draw_start_screen, draw_character_select_screen)
 def draw_start_screen():
-    pass
+    center_x = SCREEN_WIDTH // 2
+    
+    # 1. Draw the background image
+    if background_image:
+        screen.blit(background_image, (0, 0))
+    else:
+        screen.fill((0, 0, 0)) # Fallback color
+
+    # 2. Draw the text over the background
+    draw_text(screen, "RESTAURANT 67", font_large, (255, 255, 255), center_x, SCREEN_HEIGHT // 4)
+    # Using white or yellow text over the background for contrast
+    draw_text(screen, "PRESS ENTER TO START", font_medium, (255, 255, 0), center_x, SCREEN_HEIGHT * 3 // 4)
+
+def draw_character_select_screen():
+    center_x = SCREEN_WIDTH // 2
+    
+    if background_image:
+        screen.blit(background_image, (0, 0))
+    else:
+        screen.fill((0, 0, 0))
+    
+    draw_text(screen, "CHOOSE YOUR MASCOT", font_large, (255, 255, 255), center_x, SCREEN_HEIGHT // 4)
+    draw_text(screen, selected_character, font_medium, (0, 150, 255), center_x, SCREEN_HEIGHT // 2)
+    
+    if current_char_index > 0:
+        draw_text(screen, "<", font_medium, (255, 255, 255), center_x - 150, SCREEN_HEIGHT // 2)
+    
+    if current_char_index < len(CHAR_KEYS) - 1:
+        draw_text(screen, ">", font_medium, (255, 255, 255), center_x + 100, SCREEN_HEIGHT // 2)
+    
+    draw_text(screen, "PRESS ENTER TO CONTINUE", font_medium, (255, 255, 0), center_x, SCREEN_HEIGHT * 3 // 4)
+
+def draw_game_over_screen():
+    center_x = SCREEN_WIDTH // 2
+    
+    if background_image:
+        screen.blit(background_image, (0, 0))
+    else:
+        screen.fill((0, 0, 0))
+    
+    draw_text(screen, "GAME OVER", font_large, (255, 0, 0), center_x, SCREEN_HEIGHT // 3)
+    draw_text(screen, f"FINAL SCORE: {player.score}", font_medium, (255, 255, 255), center_x, SCREEN_HEIGHT // 2 - 30)
+    draw_text(screen, "PRESS ENTER TO RETRY", font_medium, (255, 255, 0), center_x, SCREEN_HEIGHT // 2 + 30)
+    draw_text(screen, "PRESS ESC FOR MAIN MENU", font_medium, (255, 255, 0), center_x, SCREEN_HEIGHT * 3 // 4)
+
+def handle_character_selection(key):
+    global game_state, current_char_index, selected_character
+    
+    if key == pygame.K_RETURN:
+        game_state = GameState.GAMEPLAY
+    
+    elif key == pygame.K_LEFT:
+        if current_char_index > 0:
+            current_char_index -= 1
+            selected_character = CHAR_KEYS[current_char_index]
+            
+    elif key == pygame.K_RIGHT:
+        if current_char_index < len(CHAR_KEYS) - 1:
+            current_char_index += 1
+            selected_character = CHAR_KEYS[current_char_index]
+
+# Asset Loading
+def load_strip(path, frame_width, frame_height):
+    sheet = pygame.image.load(path).convert_alpha()
+    frames = []
+
+    sheet_width = sheet.get_width()
+    for x in range(0, sheet_width, frame_width):
+        frame = sheet.subsurface((x, 0, frame_width, frame_height))
+        frames.append(frame)
+
+    return frames
+
+
+idle_frames = load_strip("assets/burger.png", 32, 32)
+run_frames = load_strip("assets/burger_run.png", 32, 32)
+
+animations = {
+    "idle": idle_frames,
+    "run": run_frames,
+}
+
+enemy_frame = load_strip("assets/human_walk.png", 32, 32)
+enemy_animations = {
+    "alive": enemy_frame
+}
 
 def main():
     # TODO 21: Setup the main game loop, event handling (QUIT, KEYDOWN), and game state logic
