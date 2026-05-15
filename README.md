@@ -17,7 +17,7 @@ A 2D top-down, grid-based arcade game built with Python and Pygame. Navigate thr
 ### Unique Character Skills
 | Burger Boy | Breadwinner |
 | ---------- | ----------- |
-| ![Burgerboy Projectile](docs/burger.gif) | ![Breadwinner Invincibility](docs/bread.gif) |
+| ![Burgerboy Projectile](./burger.gif) | ![Breadwinner Invincibility](./bread.gif) |
 | **Projectile Attack**: Spends score points to shoot a projectile that destroys enemies on contact. | **Invincibility**: Spends score points to become temporarily invincible, destroying enemies on collision for bonus points. |
 
 ### Dynamic Enemy AI & Power-ups
