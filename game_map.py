@@ -8,15 +8,32 @@ class Map:
         self.coins = set()
         self.powerup_location = None
 
-     # TODO 7: Implement add_coin, remove_coin, set_powerup, and remove_powerup logic
      def is_wall(self, cell_x, cell_y):
-        pass
-        
+        return self.walls[cell_y][cell_x] == 1
+
+     def is_intersection(self, cell_x, cell_y):
+        return self.intersections[cell_y][cell_x] == 1
+
      def add_coin(self, cell_x, cell_y):
-        pass
+        if self.is_wall(cell_x, cell_y):
+            return
+
+        if (cell_x, cell_y) in self.coins:
+            return
+
+        self.coins.add((cell_x, cell_y))
 
      def remove_coin(self, cell_x, cell_y):
-        pass
+        self.coins.discard((cell_x, cell_y))
+
+     def set_powerup(self, x, y):
+        self.powerup_location = (x, y)
+
+     def remove_powerup(self):
+        if self.powerup_location is not None:
+            self.powerup_location = None
+            return True
+        return False
 
 # TODO 8: Define the wall_diningroom 2D list layout mapping the walls
 wall_diningroom = []
