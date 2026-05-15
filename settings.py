@@ -1,20 +1,22 @@
-# TODO 1: Define tile size, grid dimensions, and screen dimensions
-TILESIZE = 0
-GRID_WIDTH = 0
-GRID_HEIGHT = 0
-SCREEN_WIDTH = 0
-SCREEN_HEIGHT = 0
+TILESIZE = 16
+GRID_WIDTH = 24
+GRID_HEIGHT = 24
+SCREEN_WIDTH = GRID_WIDTH * TILESIZE
+SCREEN_HEIGHT = GRID_HEIGHT * TILESIZE
 
 class GameState:
-    # TODO 2: Define GameState states (START_SCREEN, CHARACTER_SELECT, GAMEPLAY, GAME_OVER)
-    pass
+    START_SCREEN = 0
+    CHARACTER_SELECT = 1
+    GAMEPLAY = 2
+    GAME_OVER = 3
 
-# --- DIFFICULTY CONSTANTS ---
+# Difficulty Constants
 DIFFICULTY_MEDIUM_ENEMIES = 2
 DIFFICULTY_MEDIUM_SCORE = 2.0
 DIFFICULTY_MEDIUM_SPEED = 1.5
 DIFFICULTY_MEDIUM_DELAY = 1
 
+# Enemy Pathfinding Algorithm
 class SearchAlgorithm:
     BFS_SEARCH = 1
     DIJKSTRA_SEARCH = 2
@@ -22,13 +24,32 @@ class SearchAlgorithm:
 ENEMY_1_ALGORITHM = SearchAlgorithm.DIJKSTRA_SEARCH
 ENEMY_2_ALGORITHM = SearchAlgorithm.BFS_SEARCH
 
-# --- SKILL CONSTANTS ---
+# Skill Constants
 SKILL_COST = 1000
-PROJECTILE_SPEED = 5
+PROJECTILE_SPEED = 5 # Pixels per frame
 PROJECTILE_SIZE = 8
+
+# Respawn Delay in Seconds (will be converted to frames)
 RESPAWN_DELAY_EASY = 5 
 RESPAWN_DELAY_NORMAL = 10
 RESPAWN_DELAY_HARD = 15
 
 POWERUP_DROP_CHANCE = 0.1
-POWERUP_FREEZE_DURATION = 300
+POWERUP_FREEZE_DURATION = 5 * 60 # 5 seconds * 60 frames/second = 300 frames
+POWERUP_COLOR = (0, 150, 255) # Blue
+POWERUP_SIZE = 8
+
+BREAD_SKILL_COST = 1000
+BREAD_HEAL_AMOUNT = 50
+BREAD_INVINCIBILITY_DURATION = 5 * 60 # 5 seconds * 60 frames/second = 300 frames
+
+# Difficulty Options
+DIFFICULTY_OPTIONS = {
+    "NORMAL": { 
+        "enemies": DIFFICULTY_MEDIUM_ENEMIES,
+        "score_mult": DIFFICULTY_MEDIUM_SCORE,
+        "speed": DIFFICULTY_MEDIUM_SPEED,
+        "delay": DIFFICULTY_MEDIUM_DELAY,
+        "respawn_time": RESPAWN_DELAY_NORMAL*60
+    }
+}
