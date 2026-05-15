@@ -47,8 +47,23 @@ class Projectile(pygame.sprite.Sprite):
             self.direction_x = 1
 
     def update(self):
-        # TODO 11: Move projectile and check for collision with screen boundaries and walls
-        pass
+        # Move the projectile
+        self.rect.x += self.direction_x * self.speed
+        self.rect.y += self.direction_y * self.speed
+        
+        # Check screen boundaries
+        if (self.rect.left < 0 or self.rect.right > SCREEN_WIDTH or
+                self.rect.top < 0 or self.rect.bottom > SCREEN_HEIGHT):
+            self.kill()
+            return
+            
+        # Check wall collision (using the center of the projectile)
+        tile_x = self.rect.centerx // TILESIZE
+        tile_y = self.rect.centery // TILESIZE
+        
+        if 0 <= tile_x < GRID_WIDTH and 0 <= tile_y < GRID_HEIGHT:
+            if self.game_map.is_wall(tile_x, tile_y):
+                self.kill() # Projectile hits a wall and disappears
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, animations, map_data, spawn_x, spawn_y, char_type="BURGER BOY"):
