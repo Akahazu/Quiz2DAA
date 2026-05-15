@@ -50,7 +50,7 @@ class Enemies(pygame.sprite.Sprite):
         self.respawn_timer = 0
         self.respawn_delay = respawn_delay
 
-    def die(self):  # called whenever the enemy died by player's skill
+    def die(self):      # Called whenever the enemy died by player's skill
         if not self.is_dead:
             self.is_dead = True
             self.image.fill((0, 0, 0)) 
@@ -60,6 +60,14 @@ class Enemies(pygame.sprite.Sprite):
             self.target_tile = None
             self.path = []
 
-    def respawn(self):
-        # TODO 16: Reset enemy attributes to spawn point state
-        pass
+    def respawn(self):  # Resets enemy to initial spawn point and state
+        self.is_dead = False
+        self.image.fill((255, 0, 0))
+        self.tile_x = self.initial_tile_x
+        self.tile_y = self.initial_tile_y
+        self.rect.x = self.tile_x * TILESIZE
+        self.rect.y = self.tile_y * TILESIZE
+        self.pos_x = float(self.rect.x)
+        self.pos_y = float(self.rect.y)
+        self.target_tile = None
+        self.calculate_path()
