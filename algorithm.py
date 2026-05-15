@@ -18,20 +18,57 @@ def is_unblocked(grid, x, y):
 def is_destination(x, y, dest):
     return x == dest[0] and y == dest[1]
 
-# ---------- BFS ----------
+# BFS Algorithm
 def bfs_search(grid, src, dest):
     sx, sy = src
     dx, dy = dest
 
     if not is_valid(sx, sy) or not is_valid(dx, dy):
         return []
+
     if not is_unblocked(grid, sx, sy) or not is_unblocked(grid, dx, dy):
         return []
+
     if is_destination(sx, sy, dest):
         return []
 
-    # TODO 4: Initialize visited matrix, parent matrix, and queue for BFS
+    visited = [[False for _ in range(GRID_W)] for _ in range(GRID_H)]
+    parent = [[(-1, -1) for _ in range(GRID_W)] for _ in range(GRID_H)]
     
-    # TODO 5: Implement the while loop to process the queue and build the path
+    visited[sy][sx] = True
+    parent[sy][sx] = (sx, sy)
+    
+    queue = deque([(sx, sy)])
+    directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+    
+    while queue:
+        x, y = queue.popleft()
+        
+        for dx_step, dy_step in directions:
+            nx = x + dx_step
+            ny = y + dy_step
+            
+            if not is_valid(nx, ny):
+                continue
+            if visited[ny][nx]:
+                continue
+            if not is_unblocked(grid, nx, ny):
+                continue
+            
+            visited[ny][nx] = True
+            parent[ny][nx] = (x, y)
+            
+            if is_destination(nx, ny, dest):
+                # Trace path
+                path = []
+                cx, cy = dest
+                while parent[cy][cx] != (cx, cy):
+                    path.append((cx, cy))
+                    cx, cy = parent[cy][cx]
+                path.append((cx, cy))
+                path.reverse()
+                return path
+            
+            queue.append((nx, ny))
     
     return []
