@@ -1,7 +1,8 @@
 import pygame
+from pytmx import load_pygame
 from settings import *
 from core import Player, Projectile, Enemies, PowerUp
-from game_map import Map 
+from game_map import map_diningroom
 
 pygame.init()
 
@@ -44,6 +45,15 @@ except pygame.error as e:
     print(f"Error loading background image: {e}")
     print("Using black screen fallback.")
     background_image = None # Fallback to no image if loading fails
+
+CHAR_KEYS = list(CHAR_OPTIONS.keys())
+current_char_index = 0
+
+# --- Menu Display Data ---
+selected_character = CHAR_KEYS[current_char_index]
+
+powerup_active_timer = 0
+powerup_sprite = pygame.sprite.GroupSingle()
 
 # Helper function to render text
 def draw_text(surface, text, font, color, x, y, outline_color=(0, 0, 0), outline_size=1):
@@ -176,9 +186,169 @@ enemy_animations = {
     "alive": enemy_frame
 }
 
-def main():
-    # TODO 21: Setup the main game loop, event handling (QUIT, KEYDOWN), and game state logic
-    pass
+# Global variables to store the final settings based on character and difficulty selection
+FINAL_ENEMIES_COUNT = 0
+FINAL_ENEMY_SPEED = 0.0
+FINAL_ENEMY_DROP_DELAY = 0
+FINAL_SCORE_MULTIPLIER = 1.0
+FINAL_RESPAWN_TIME = 0
+GAME_INITIALIZED = False    # Semaphore to control one-time setup
 
-if __name__ == "__main__":
-    main()
+running = True
+while running:
+    clock.tick(60)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+            
+        elif event.type == pygame.KEYDOWN:
+            
+            # Handle selection states
+            if game_state == GameState.CHARACTER_SELECT:
+                handle_character_selection(event.key)
+
+            elif game_state == GameState.GAMEPLAY and event.key == pygame.K_SPACE:
+                player.use_skill()
+
+            elif game_state == GameState.GAME_OVER:
+                if event.key == pygame.K_RETURN:
+                    # Retry - reset and go back to gameplay
+                    game_state = GameState.GAMEPLAY
+                    GAME_INITIALIZED = False
+                elif event.key == pygame.K_ESCAPE:
+                    # Return to main menu
+                    game_state = GameState.START_SCREEN
+                    GAME_INITIALIZED = False
+                    current_char_index = 0
+                    selected_character = CHAR_KEYS[current_char_index]
+
+            elif event.key == pygame.K_RETURN:
+                if game_state == GameState.START_SCREEN:
+                    game_state = GameState.CHARACTER_SELECT
+                elif game_state == GameState.CHARACTER_SELECT:
+                    game_state = GameState.GAMEPLAY
+
+    # Draw Logic based on Current State
+    if game_state == GameState.START_SCREEN:
+        draw_start_screen()
+    elif game_state == GameState.CHARACTER_SELECT:
+        draw_character_select_screen()
+    elif game_state == GameState.GAME_OVER:
+        draw_game_over_screen()
+    elif game_state == GameState.GAMEPLAY:
+        # Game initialization block - runs once when entering gameplay state
+        if not GAME_INITIALIZED:
+            char_paths = CHAR_OPTIONS[selected_character]
+            char_idle = load_strip(char_paths["idle"], 32, 32)
+            char_run = load_strip(char_paths["run"], 32, 32)
+            
+            selected_animations = {
+                "idle": char_idle,
+                "run": char_run,
+            }
+
+            # Render map and collision data
+            maps = MAP_OPTIONS["DINNING ROOM"] 
+            tmx_data = load_pygame(maps["tmx_data"])
+            map_data = maps["map_data"]
+            
+            # Reset map state (clear old coins and powerups)
+            map_data.coins = set()
+            map_data.powerup_location = None
+            
+            spawn_x = maps["spawn_x"]
+            spawn_y = maps["spawn_y"]
+            
+            # Create Player with the selected animations
+            player = Player(selected_animations, map_data , spawn_x, spawn_y, selected_character)
+            player_sprite = pygame.sprite.GroupSingle(player)
+            all_sprites = pygame.sprite.Group(player)
+
+            # Get the settings based on the final selection
+            settings = DIFFICULTY_OPTIONS["NORMAL"] 
+            FINAL_ENEMIES_COUNT = settings["enemies"]
+            FINAL_ENEMY_SPEED = settings["speed"]
+            FINAL_ENEMY_DROP_DELAY = settings["delay"]
+            FINAL_SCORE_MULTIPLIER = settings["score_mult"] # get multiplier
+            FINAL_RESPAWN_TIME = settings["respawn_time"] # get respawn time
+
+            player.score_multiplier = FINAL_SCORE_MULTIPLIER
+            projectiles_sprite = pygame.sprite.Group() 
+            player.projectile_group = projectiles_sprite
+            enemies_sprite = pygame.sprite.Group()
+            
+            # Spawn enemies based on difficulty
+            if FINAL_ENEMIES_COUNT >= 1:
+                # Enemy 1 - Top Left Corner Spawn
+                enemy1 = Enemies(map_data, player, 4, 5, FINAL_ENEMY_SPEED, 1, FINAL_ENEMY_DROP_DELAY, FINAL_RESPAWN_TIME)
+                enemies_sprite.add(enemy1)
+                all_sprites.add(enemy1)
+                
+            if FINAL_ENEMIES_COUNT >= 2:
+                # Enemy 2 - Top Right Corner Spawn
+                enemy2 = Enemies(map_data, player, 21, 4, FINAL_ENEMY_SPEED, 2, FINAL_ENEMY_DROP_DELAY, FINAL_RESPAWN_TIME)
+                enemies_sprite.add(enemy2)
+                all_sprites.add(enemy2)
+                
+            if FINAL_ENEMIES_COUNT >= 3:
+                enemy3 = Enemies(map_data, player, 1, 16, FINAL_ENEMY_SPEED, 1, FINAL_ENEMY_DROP_DELAY, FINAL_RESPAWN_TIME)
+                enemies_sprite.add(enemy3)
+                all_sprites.add(enemy3)
+                
+            GAME_INITIALIZED = True
+            # End of one-time initialization block
+
+        enemies_sprites_list = enemies_sprite.sprites()
+
+        if powerup_active_timer > 0:
+            powerup_active_timer -= 1
+            if powerup_active_timer == 0:
+                for enemy in enemies_sprites_list:
+                    enemy.is_frozen = False
+
+        if maps["map_data"].powerup_location is not None and not powerup_sprite.has(maps["map_data"].powerup_location):
+            x, y = maps["map_data"].powerup_location
+            powerup_sprite.empty()
+            new_powerup = PowerUp(x, y)
+            powerup_sprite.add(new_powerup)
+        elif maps["map_data"].powerup_location is None:
+            powerup_sprite.empty()
+        
+        # Core game loop logic
+        active_enemies = [e for e in enemies_sprite.sprites() if not e.is_dead]
+        hits = pygame.sprite.spritecollide(player, enemies_sprite, False)
+        for enemy in hits:
+            if not enemy.is_dead: # Ignore already dead enemies
+                if player.invincible_timer > 0:
+                    # Bread Skill is active: Invincible!
+                    enemy.die()
+                    player.score += int(200 * player.score_multiplier)
+                else:
+                    # No skill active: Game Over
+                    game_state = GameState.GAME_OVER
+
+        projectile_hits = pygame.sprite.groupcollide(projectiles_sprite, enemies_sprite, True, False)
+        for projectile, hit_enemies in projectile_hits.items():
+            for enemy in hit_enemies:
+                enemy.die() # The enemy disappears and starts its respawn timer
+
+        if player.update():
+            maps["map_data"].remove_powerup()
+            powerup_active_timer = POWERUP_FREEZE_DURATION
+
+            for enemy in enemies_sprites_list:
+                enemy.is_frozen = True
+
+        screen.fill((0, 0, 0))
+        draw_map(screen, tmx_data)
+        draw_coins(screen, map_data)
+        all_sprites.update()
+        projectiles_sprite.update() 
+        powerup_sprite.update()
+        all_sprites.draw(screen)
+        projectiles_sprite.draw(screen)
+        powerup_sprite.draw(screen)
+        draw_score(screen, player.score, font_medium, (255, 255, 255), 70, 15)
+
+    pygame.display.flip()
