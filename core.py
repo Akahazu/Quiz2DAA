@@ -7,8 +7,17 @@ from enemies import Enemies
 class PowerUp(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        # TODO 9: Create the powerup surface, fill with transparent background, and draw a circle
-        pass
+        
+        # Create a small blue circle surface
+        self.image = pygame.Surface((TILESIZE, TILESIZE), pygame.SRCALPHA)
+        self.image.fill((0,0,0,0)) # Transparent background
+        
+        # Draw the blue circle
+        center_x = TILESIZE // 2
+        center_y = TILESIZE // 2
+        pygame.draw.circle(self.image, POWERUP_COLOR, (center_x, center_y), POWERUP_SIZE)
+        
+        self.rect = self.image.get_rect(topleft=(x * TILESIZE, y * TILESIZE))
 
 class Projectile(pygame.sprite.Sprite):
     def __init__(self, start_pos, direction_x, direction_y, game_map):
