@@ -3,9 +3,36 @@ from settings import *
 from core import Player, Projectile, Enemies, PowerUp
 from game_map import Map 
 
-# TODO 17: Initialize pygame, setup screen, and load fonts
 pygame.init()
 
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Restaurant 67")
+font_large = pygame.font.Font("assets/font/slkscrb.ttf", 26) # Use a large font for titles
+font_medium = pygame.font.Font("assets/font/slkscr.ttf", 24) # Use a medium font for options
+
+clock = pygame.time.Clock()
+MAP_OPTIONS = {
+    "DINNING ROOM": {
+        "tmx_data": "assets/Restaurant.tmx",
+        "map_data": map_diningroom,
+        "spawn_x": GRID_WIDTH // 2,
+        "spawn_y": GRID_HEIGHT // 2
+    }
+}
+
+CHAR_OPTIONS = {
+    "BURGERBOY": {
+        "idle": "assets/burger.png",
+        "run": "assets/burger_run.png"
+    },
+    
+    "BREADWINNER": {
+        "idle": "assets/bread.png",
+        "run": "assets/bread_run.png"
+    }
+}
+
+score = 0
 # TODO 18: Load background image (start_screen.jpeg) with try-except block for error handling
 background_image = None
 
