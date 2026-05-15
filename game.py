@@ -45,9 +45,48 @@ except pygame.error as e:
     print("Using black screen fallback.")
     background_image = None # Fallback to no image if loading fails
 
-# TODO 19: Implement draw_text helper function with outline logic
+# Helper function to render text
 def draw_text(surface, text, font, color, x, y, outline_color=(0, 0, 0), outline_size=1):
-    pass
+    # Render the text surface
+    text_surface = font.render(text, True, color)
+    text_rect = text_surface.get_rect(center=(x, y))
+
+    outline_surface = font.render(text, True, outline_color) # Draw the outline by blitting the outline_color text multiple times
+
+    offsets = [ # Offsets for the outline (1 pixel in all 8 directions)
+        (-outline_size, -outline_size), (0, -outline_size), (outline_size, -outline_size),
+        (-outline_size, 0), (outline_size, 0),
+        (-outline_size, outline_size), (0, outline_size), (outline_size, outline_size)
+    ]
+
+    for offset_x, offset_y in offsets:
+        outline_rect = outline_surface.get_rect(center=(x + offset_x, y + offset_y))
+        surface.blit(outline_surface, outline_rect)
+
+    surface.blit(text_surface, text_rect)   # Draw the main text over the outline
+
+def draw_map(surface, tmx_data):
+    for layer in tmx_data.visible_layers:
+        if hasattr(layer, "tiles"): # tile layer
+            for x, y, tile in layer.tiles():
+                surface.blit(tile, (x * tmx_data.tilewidth, y * tmx_data.tileheight))
+
+def draw_coins(surface, game_map):
+    for x, y in game_map.coins:
+        px = x * TILESIZE
+        py = y * TILESIZE
+        pygame.draw.circle(surface, (255, 215, 0), (px + TILESIZE // 2, py + TILESIZE // 2), TILESIZE // 4)
+
+def draw_powerup(surface, game_map):
+    if game_map.powerup_location is not None:
+        x, y = game_map.powerup_location
+        px = x * TILESIZE
+        py = y * TILESIZE
+        pygame.draw.circle(surface, POWERUP_COLOR, (px + TILESIZE // 2, py + TILESIZE // 2), POWERUP_SIZE)
+
+def draw_score(surface, score, font, color, x, y, outline_color=(0, 0, 0), outline_size=1):
+    score_text = f"SCORE: {score}"
+    draw_text(surface, score_text, font, color, x, y, outline_color, outline_size)
 
 # TODO 20: Implement state-specific draw functions (draw_start_screen, draw_character_select_screen)
 def draw_start_screen():
