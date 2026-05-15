@@ -33,8 +33,17 @@ CHAR_OPTIONS = {
 }
 
 score = 0
-# TODO 18: Load background image (start_screen.jpeg) with try-except block for error handling
-background_image = None
+
+game_state = GameState.START_SCREEN
+
+# Load background image (start_screen.jpeg) with try-except block for error handling
+try:
+    background_image = pygame.image.load("assets/start_screen.jpeg").convert()
+    background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+except pygame.error as e:
+    print(f"Error loading background image: {e}")
+    print("Using black screen fallback.")
+    background_image = None # Fallback to no image if loading fails
 
 # TODO 19: Implement draw_text helper function with outline logic
 def draw_text(surface, text, font, color, x, y, outline_color=(0, 0, 0), outline_size=1):
