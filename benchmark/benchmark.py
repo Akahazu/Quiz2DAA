@@ -1,55 +1,79 @@
+# benchmark/benchmark.py
 import random
 import perfplot
-from game.algorithm import bfs_search, dijkstra_search
+from pathlib import Path
+from game.algorithm import a_star_weighted, bfs_search, dijkstra_weighted
 
-# 1. A scaling mock map class that matches your game_map structure
+# Fixed scaling mock map with costs (reproducible)
 class BenchmarkMap:
-    def __init__(self, n, wall_ratio=0.15):
+    def __init__(self, n, wall_ratio=0.15, seed=12345):
         self.width = n
         self.height = n
-        self.walls = [[1 if random.random() < wall_ratio else 0 for _ in range(n)] for _ in range(n)]
+        rng = random.Random(seed)  # fixed seed for reproducibility
+        
+        self.walls = [[0] * n for _ in range(n)]
+        self.costs = [[0] * n for _ in range(n)]
+        
+        for y in range(n):
+            for x in range(n):
+                if rng.random() < wall_ratio:
+                    self.walls[y][x] = 1
+                    self.costs[y][x] = 0
+                else:
+                    self.costs[y][x] = rng.randint(1, 5)
+        
+        # Ensure start and end are open
+        self.walls[0][0] = 0
+        self.costs[0][0] = 1
+        self.walls[n-1][n-1] = 0
+        self.costs[n-1][n-1] = 1
 
-    def is_wall(self, cell_x, cell_y):
-        if 0 <= cell_x < self.width and 0 <= cell_y < self.height:
-            return self.walls[cell_y][cell_x] == 1
+    def is_wall(self, x, y):
+        if 0 <= x < self.width and 0 <= y < self.height:
+            return self.walls[y][x] == 1
         return True
 
-# 2. Setup function required by perfplot for each size N
+    def get_cost(self, x, y):
+        if self.is_wall(x, y):
+            return float('inf')
+        return self.costs[y][x]
+
+# Setup function for perfplot (N = grid dimension)
 def setup_benchmark_instance(n):
     import game.algorithm as algorithm
     algorithm.GRID_W = n
     algorithm.GRID_H = n
     
-    mock_map = BenchmarkMap(n, wall_ratio=0.15)
+    # Use a base seed that varies with N to ensure different maps per size,
+    # but still deterministic
+    mock_map = BenchmarkMap(n, wall_ratio=0.15, seed=12345 + n)
     src = (0, 0)
     dest = (n - 1, n - 1)
-    
-    # Ensure start and end points are never blocked by random walls
-    mock_map.walls[src[1]][src[0]] = 0
-    mock_map.walls[dest[1]][dest[0]] = 0
-    
     return mock_map, src, dest
 
-# 3. Kernel wrappers adjusted to receive the unpacked tuple elements
+# Kernel wrappers – just return the path (perfplot only times the call)
 def run_bfs(mock_map, src, dest):
     return bfs_search(mock_map, src, dest)
 
+def run_a_star(mock_map, src, dest):
+    return a_star_weighted(mock_map, src, dest)
+
 def run_dijkstra(mock_map, src, dest):
-    return dijkstra_search(mock_map, src, dest)
+    return dijkstra_weighted(mock_map, src, dest)
 
 if __name__ == "__main__":
+    Path("benchmark/output").mkdir(parents=True, exist_ok=True)
+    # 7 sizes: 16^2=256, 1024^2=1,048,576 (spans > 2 orders of magnitude)
+    sizes = [16, 32, 64, 128, 256, 512, 1024]
+
     out = perfplot.bench(
         setup=setup_benchmark_instance,
-        kernels=[run_bfs, run_dijkstra],
-        labels=["BFS - O(V + E)", "Dijkstra - O((V + E) log V)"],
-
-        # 5 sizes spanning over two orders of magnitude (Vertices = N^2)
-        n_range=[10**i for i in range(1, 4)],
+        kernels=[run_bfs, run_a_star, run_dijkstra],
+        labels=["BFS", "A*", "Dijkstra"],
+        n_range=sizes,
         xlabel="Grid Dimension (N x N)",
-        title="Pathfinding Performance Complexity Scaling Analysis",
-        equality_check=None # Disable simple equality check because paths might take different routes but have identical step counts
+        title="Pathfinding Runtime Scaling (Weighted Grid)",
+        equality_check=None,  # Paths differ, so we don't compare
     )
-    
-    # Save the generated graph directly for your report document
-    out.save("benchmark/output/pathfinding_benchmark_perfplot.png")
+    out.save("benchmark/output/pathfinding_runtime_scaling.png")
     out.show()
