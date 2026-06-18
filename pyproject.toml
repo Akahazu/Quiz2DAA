@@ -1,0 +1,12 @@
+[project]
+name = "quiz2daa"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "perfplot",
+    "numpy",
+    "pygame",
+    "pytmx",
+]
