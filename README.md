@@ -17,7 +17,7 @@ A 2D top-down, grid-based arcade game built with Python and Pygame. Navigate thr
 ### Unique Character Skills
 | Burger Boy | Breadwinner |
 | ---------- | ----------- |
-| ![Burgerboy Projectile](./burger.gif) | ![Breadwinner Invincibility](./bread.gif) |
+| ![Burgerboy Projectile](./docs/burger.gif) | ![Breadwinner Invincibility](./docs/bread.gif) |
 | **Projectile Attack**: Spends score points to shoot a projectile that destroys enemies on contact. | **Invincibility**: Spends score points to become temporarily invincible, destroying enemies on collision for bonus points. |
 
 ### Dynamic Enemy AI & Power-ups
@@ -51,13 +51,14 @@ Ensure you have Python 3.x installed on your system.
 2. **Install Dependencies**
 
       ```bash
-      pip install pygame pytmx
+      pip install uv
+      uv sync
       ```
 
 3. **Run the game**
 
       ```bash
-      python game.py
+      uv run python -m game.game
       ```
 
 ## Controls

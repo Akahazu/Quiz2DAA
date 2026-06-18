@@ -1,8 +1,5 @@
 import pygame
-import random
-from settings import *
-from algorithm import bfs_search
-from enemies import Enemies
+from game.settings import *
 
 class PowerUp(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -101,7 +98,7 @@ class Player(pygame.sprite.Sprite):
         self.last_tiles = [(self.tile_x, self.tile_y) for _ in range(8)]
         self.invincible_timer = 0
 
-    def update(self):
+    def player_update(self):
         # The order matters: handle input (with collision) then animate
         self.handle_input() 
         self.animate()

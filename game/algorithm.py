@@ -1,7 +1,7 @@
 from collections import deque
 import heapq
-from settings import *
-from game_map import *
+from game.settings import *
+from game.game_map import *
 
 GRID_W = GRID_WIDTH
 GRID_H = GRID_HEIGHT

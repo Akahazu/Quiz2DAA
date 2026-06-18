@@ -1,5 +1,4 @@
-import pygame
-from settings import *
+from game.settings import *
 
 class Map:
      def __init__(self, map_walls = [[0 for i in range(GRID_WIDTH)] for j in range(GRID_HEIGHT)], map_intersections = [[0 for i in range(GRID_WIDTH)] for j in range(GRID_HEIGHT)]):

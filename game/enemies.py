@@ -1,7 +1,7 @@
 import pygame
 import random
-from settings import *
-from algorithm import bfs_search, dijkstra_search
+from game.settings import *
+from game.algorithm import bfs_search, dijkstra_search
 
 class Enemies(pygame.sprite.Sprite):
     def __init__(self, game_map, player, tile_x, tile_y, speed, enemy_id, drop_delay, respawn_delay):
