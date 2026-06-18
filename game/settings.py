@@ -1,55 +1,20 @@
+# settings.py
 TILESIZE = 16
 GRID_WIDTH = 24
 GRID_HEIGHT = 24
 SCREEN_WIDTH = GRID_WIDTH * TILESIZE
 SCREEN_HEIGHT = GRID_HEIGHT * TILESIZE
 
-class GameState:
-    START_SCREEN = 0
-    CHARACTER_SELECT = 1
-    GAMEPLAY = 2
-    GAME_OVER = 3
+# Colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+LIGHT_BLUE = (173, 216, 230)
+RED = (255, 0, 0)
+ORANGE = (255, 165, 0)
 
-# Difficulty Constants
-DIFFICULTY_MEDIUM_ENEMIES = 2
-DIFFICULTY_MEDIUM_SCORE = 2.0
-DIFFICULTY_MEDIUM_SPEED = 1.5
-DIFFICULTY_MEDIUM_DELAY = 1
+# Movement speed (pixels per frame)
+PLAYER_SPEED = 3
+ENEMY_SPEED = 1.5
 
-# Enemy Pathfinding Algorithm
-class SearchAlgorithm:
-    BFS_SEARCH = 1
-    DIJKSTRA_SEARCH = 2
-
-ENEMY_1_ALGORITHM = SearchAlgorithm.DIJKSTRA_SEARCH
-ENEMY_2_ALGORITHM = SearchAlgorithm.BFS_SEARCH
-
-# Skill Constants
-SKILL_COST = 1000
-PROJECTILE_SPEED = 5 # Pixels per frame
-PROJECTILE_SIZE = 8
-
-# Respawn Delay in Seconds (will be converted to frames)
-RESPAWN_DELAY_EASY = 5 
-RESPAWN_DELAY_NORMAL = 10
-RESPAWN_DELAY_HARD = 15
-
-POWERUP_DROP_CHANCE = 0.1
-POWERUP_FREEZE_DURATION = 5 * 60 # 5 seconds * 60 frames/second = 300 frames
-POWERUP_COLOR = (0, 150, 255) # Blue
-POWERUP_SIZE = 8
-
-BREAD_SKILL_COST = 1000
-BREAD_HEAL_AMOUNT = 50
-BREAD_INVINCIBILITY_DURATION = 5 * 60 # 5 seconds * 60 frames/second = 300 frames
-
-# Difficulty Options
-DIFFICULTY_OPTIONS = {
-    "NORMAL": { 
-        "enemies": DIFFICULTY_MEDIUM_ENEMIES,
-        "score_mult": DIFFICULTY_MEDIUM_SCORE,
-        "speed": DIFFICULTY_MEDIUM_SPEED,
-        "delay": DIFFICULTY_MEDIUM_DELAY,
-        "respawn_time": RESPAWN_DELAY_NORMAL*60
-    }
-}
+# Font size for cost display
+COST_FONT_SIZE = 12
