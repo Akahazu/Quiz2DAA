@@ -17,8 +17,3 @@ dependencies = [
 dev = [
     "ruff>=0.15.17",
 ]
-
-[dependency-groups]
-dev = [
-    "ruff>=0.15.17",
-]
