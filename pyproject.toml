@@ -1,5 +1,5 @@
 [project]
-name = "quiz2daa"
+name = "DAA-finals"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -9,4 +9,9 @@ dependencies = [
     "numpy",
     "pygame",
     "pytmx",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.17",
 ]
