@@ -1,4 +1,4 @@
-# Quiz2DAA
+# DAA Finals
 
 | NRP | Name | Class | GitHub |
 | --- | ---- | ----- | ------ |
@@ -6,36 +6,20 @@
 | 5025241152 | Bintang Ilham Pabeta | E | [@ilhmpbta](https://github.com/ilhmpbta) |
 | 5025241162 | Felix Aldorino | F | [@NewGenome](https://github.com/NewGenome) |
 
-# Restaurant 67 🍔🍞
+# Restaurant 67 - Debug Version
 
-A 2D top-down, grid-based arcade game built with Python and Pygame. Navigate through a confined restaurant map, collect coins to increase your score, and survive dynamic enemies powered by BFS and Dijkstra pathfinding algorithms!
+An experimental version of the current game (made by the same team) in order to test multiple scenario regarding pathfinding algorithm problems with randomized cost in the same map. These includes the visualization of the path cost, the lines that shows the pathfinding algorithm in action, and the configurable map seed & algorithm.
+
+The main difference lies in the removal of the gamification aspect of the game, focusing solely on the pathfinding algorithm problems (This is basically an extension of the real application).
 
 ## Gameplay
 
-![Gameplay Demo](docs/gameplay.gif)
+The real application can be accessed in [@Akahazu/Quiz2DAA](https://github.com/Akahazu/Quiz2DAA)
 
-### Unique Character Skills
-| Burger Boy | Breadwinner |
-| ---------- | ----------- |
-| ![Burgerboy Projectile](./docs/burger.gif) | ![Breadwinner Invincibility](./docs/bread.gif) |
-| **Projectile Attack**: Spends score points to shoot a projectile that destroys enemies on contact. | **Invincibility**: Spends score points to become temporarily invincible, destroying enemies on collision for bonus points. |
+![Gameplay](docs/f-gameplay.gif)
 
-### Dynamic Enemy AI & Power-ups
-![Enemy Freeze Powerup](docs/freeze.gif)  
-Enemies actively hunt the player using two distinct graph traversal algorithms:
+> Note that there are lines with the corresponding enemy color that show the pathfinding algorithm in action.
 
-* **Enemy 1:** Utilizes **Dijkstra's Algorithm** (Priority Queue/Min-Heap).
-* **Enemy 2:** Utilizes **Breadth-First Search (BFS)**.
-
-Collecting the rare Blue Power-up temporarily freezes all enemies on the map.
-
----
-
-## Features
-* **Dual Pathfinding Architecture:** Custom pathfinding module evaluating grid matrices in real-time.
-* **State Machine Pattern:** Clean transitions between Start Screen, Character Selection, Gameplay, and Game Over states.
-* **Grid-Based Collision:** Strict matrix-level bounds checking and Pygame sprite hitboxes.
-* **Map Parsing:** `.tmx` tilemap integration via `pytmx`.
 
 ## Installation & Setup
 
@@ -44,8 +28,8 @@ Ensure you have Python 3.x installed on your system.
 1. **Clone the repository:**
 
       ```bash
-      git clone https://github.com/Akahazu/Quiz2DAA
-      cd Quiz2DAA
+      git clone https://github.com/ilhmpbta/DAA-finals
+      cd DAA-finals
       ```
 
 2. **Install Dependencies**
@@ -61,22 +45,83 @@ Ensure you have Python 3.x installed on your system.
       uv run python -m game.game
       ```
 
+4. **Customization**
+
+    ```bash
+    uv run python -m game.game <seed> <enemy_1_algorithm> <enemy_2_algorithm>
+    ```
+
+    - For example (this is the default setting when you run the game without any arguments):
+  
+      ```bash
+      uv run python -m game.game 42 a_star dijkstra
+      ```
+
 ## Controls
 
 - **Movement:** `W`, `A`, `S`, `D` or `Arrow Keys`
-- **Use Skill:** `SPACEBAR` (Requires 1000 score points)
-- **Quit Game:** Close window or `ESC`
 
 ## Project Structure
 
-- `game.py` - The main game loop and UI rendering.
-- `core.py` - Player, Projectiles, and PowerUp entity classes.
-- `enemies.py` - Enemy logic, pathfinding execution, and respawn timers.
-- `algorithm.py` - Core algorithms (BFS & Dijkstra) utilizing `collections.deque` and `heapq`.
-- `game_map.py` - Matrix layouts, wall generation, and coin management.
-- `settings.py` - Global variables, constants, and configuration.
+- `game/` - Game logic and UI rendering.
+  - `game.py` - The main game loop and UI rendering.
+  - `core.py` - Player entity class and movement/collision logic.
+  - `enemies.py` - Enemy logic, pathfinding execution, and path visualization.
+  - `algorithm.py` - Core algorithms (BFS, Dijkstra, A*) utilizing `collections.deque` and `heapq`.
+  - `game_map.py` - Matrix layouts, wall definitions, and terrain cost management.
+  - `settings.py` - Global variables, constants, and configuration.
+- `benchmark/` - Benchmarking scripts for measuring pathfinding performance.
+  - `benchmark.py` - Scaling benchmark for runtime vs grid size.
+  - `compare_seeds.py` - Script for comparing pathfinding results across 100 different seed values.
+  - `output/` - Output directory for benchmark results.
+    - `cost_difference.png` - Visual comparison of cost differences between A* and Dijkstra.
+    - `pathfinding_runtime_scaling.png` - Visual comparison of runtime scaling between A* and Dijkstra (also BFS as baseline).
+    - `runtime_boxplots.png` - Boxplot comparison of runtime distribution between A* and Dijkstra.
+    - `seed_comparison.csv` - CSV file containing seed-algorithm pathfinding cost and runtime results.
+    - `seed_differences.csv` - CSV file containing seed difference (cost difference) results.
 
-## Game Over
+## Benchmarking
 
-![Game Over](docs/gameover.gif)
+This project includes two independent benchmark scripts to evaluate the performance and correctness of the pathfinding algorithms on weighted grids.
 
+### 1. Scaling Benchmark (benchmark/benchmark.py)
+
+Measures runtime scaling as grid size increases (N = 16, 32, 64, 128, 256, 512, 1024) for BFS, A*, and Dijkstra on randomly generated maps with vertex costs (1–5). The results are used to verify theoretical complexity (O(N²) vs O(N² log N)).
+
+**Run:**
+
+```bash
+uv run python -m benchmark.benchmark
+```
+**Output:**
+
+![Benchmark Runtime Scaling](benchmark/output/pathfinding_runtime_scaling.png) 
+log‑log plot of runtime vs grid dimension.
+
+> Note: Slight variations between runs are expected due to OS scheduling; the map generation uses a fixed seed for reproducibility.
+
+### 2. Seed Comparison (benchmark/compare_seeds.py)
+
+Compares A* and Dijkstra on the fixed 24×24 dining‑room map with 100 different random cost configurations (seeds 1–100). It records runtime, path cost, and path length from two enemy start positions to the player at the centre. This script proves that A* and Dijkstra always produce identical optimal costs (empirical correctness check) and shows the speed advantage of A* due to the Manhattan heuristic.
+
+**Run:**
+
+```bash
+uv run python -m benchmark.compare_seeds
+```
+
+**Outputs (saved in benchmark/output/):**
+
+- [seed_comparison.csv](benchmark/output/seed_comparison.csv) – raw data for all seeds, starts, and algorithms.
+- [seed_differences.csv](benchmark/output/seed_differences.csv) – pivoted table with side‑by‑side costs and times for easy statistical analysis.
+- [runtime_boxplots.png](benchmark/output/runtime_boxplots.png) – boxplots showing runtime distribution per start position and algorithm.
+- [cost_difference.png](benchmark/output/cost_difference.png) – scatter plot of cost differences (A* − Dijkstra), confirming they are always zero.
+
+| |
+| :---: |
+| ![runtime_boxplots.png](benchmark/output/runtime_boxplots.png) | 
+| Runtime boxplots |
+| ![cost_difference.png](benchmark/output/cost_difference.png) | 
+| Cost difference scatter plot (always 0 beacuse they always find the same path - the most optimal path) |
+
+All benchmarks are fully reproducible (fixed seeds). The generated CSV files are used directly for the final report's Analysis & Evaluation section.
